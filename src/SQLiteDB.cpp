@@ -81,6 +81,7 @@ bool SQLiteDB::UpdateTableSchema(SQLiteTable &table) {
         return false;
     }
 
+    size_t rowCount=0;
     // one row at a time
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         int numCols = sqlite3_column_count(stmt);
@@ -97,7 +98,9 @@ bool SQLiteDB::UpdateTableSchema(SQLiteTable &table) {
         }
         if (!name.empty() && !type.empty()) {
             table.InsertEle(name, type);
-            std::cout <<"name"<<name<<"type"<<type<<"\n";
+            table.SetColNum(name,rowCount);
+            rowCount++;
+            //std::cout <<"name"<<name<<"type"<<type<<"\n";
         } else {
             // schema incomplete
             return false;
@@ -107,12 +110,64 @@ bool SQLiteDB::UpdateTableSchema(SQLiteTable &table) {
     return true;
 }
 
+//rename to colNames
+std::string SQLiteDB::BuildSelect(const SQLiteTable &table,const std::vector<std::string> &columNames)
+{
+    std::string SQLSelect="SELECT "; 
+    bool first=true;
+    for(const std::string &col:columNames)
+    {
+        if(first)
+        {
+            first=false;
+        }
+        else{
+            SQLSelect+=",";
+        }
+        SQLSelect+=col;
+    }
+    SQLSelect+=" FROM "+ table.GetName();
+    return SQLSelect;
+}
+
+std::string SQLiteDB::BuildWhere(const SQLiteTable &table)
+{
+    bool isFirst=true;
+    std::string SQLWhere;
+    for (const std::pair<std::string,WhereClause> clause:filters) {
+        
+        if(isFirst)
+        {
+          isFirst=false;
+          SQLWhere+=" Where ";
+        }
+        else{
+          if(clause.second.isAnd==true)
+          {
+            SQLWhere+=" AND ";
+          }
+          else{
+            SQLWhere+=" OR ";
+          }
+        }
+
+        SQLWhere +=clause.first+ "=";
+        const std::string colType = table.GetColumnType(clause.first);
+        //std::cout<<"name "<<clause.first<<"type "<<colType<<"\n";
+        if (colType == SQL::TEXT) {
+            SQLWhere += "\"" + clause.second.val + "\"";
+        } else {
+            SQLWhere += clause.second.val;
+        }
+    }
+    return SQLWhere;
+}
 // needs to be changed to respect true type of the column
 std::vector<std::string>
 SQLiteDB::GetDistinctColumnValues(const SQLiteTable &table,
                                   const std::string &columnName) {
     const std::string SQLSelectDist =
-        "SELECT DISTINCT " + columnName + " FROM " + table.GetName();
+        "SELECT DISTINCT " + columnName + " FROM " + table.GetName() + BuildWhere(table);
     sqlite3_stmt *stmt = nullptr;
 
     int rc = sqlite3_prepare_v2(db, SQLSelectDist.c_str(), -1, &stmt, nullptr);
@@ -128,8 +183,7 @@ SQLiteDB::GetDistinctColumnValues(const SQLiteTable &table,
     sqlite3_finalize(stmt);
     return values;
 }
-// cant const table because of GetColumnType
-double SQLiteDB::GetDBColum(SQLiteTable &table, const std::string &columnName) {
+double SQLiteDB::GetDBColumn(const SQLiteTable &table, const std::string &columnName) {
     std::string SQLSelect = "SELECT " + columnName + " FROM " + table.GetName()+" ";
     bool isFirst=true;
     for (const std::pair<std::string,WhereClause> clause:filters) {
