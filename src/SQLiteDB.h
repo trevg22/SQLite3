@@ -44,10 +44,21 @@ public:
 
   bool UpdateTableSchema(SQLiteTable &table);
 
-  std::vector<std::string>
-  GetDistinctColumnValues(const SQLiteTable &table,
-                          const std::string &columnName);
-  double GetDBColumn(const SQLiteTable &table, const std::string &columnName);
+  template <typename T>
+  std::vector<T> GetDistinctColumnValues(const SQLiteTable &table,
+                                         const std::string &columnName);
+  template<>
+      std::vector<std::string> GetDistinctColumnValues(const SQLiteTable &table,
+                                         const std::string &columnName);
+  template<>
+      std::vector<double> GetDistinctColumnValues(const SQLiteTable &table,
+                                         const std::string &columnName);
+
+  //std::vector<std::string>
+      // GetDistinctColumnValues(const SQLiteTable &table,
+      //                        const std::string &columnName);
+      double GetDBColumn(const SQLiteTable &table,
+                         const std::string &columnName);
   template <typename T, typename... Args>
   void GetDBColumns(SQLiteTable &table, std::vector<std::string> &columnNames,
                     T callback, const Args &...args);
