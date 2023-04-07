@@ -47,12 +47,13 @@ public:
   template <typename T>
   std::vector<T> GetDistinctColumnValues(const SQLiteTable &table,
                                          const std::string &columnName);
-  template<>
+  /*template<>
       std::vector<std::string> GetDistinctColumnValues(const SQLiteTable &table,
                                          const std::string &columnName);
   template<>
       std::vector<double> GetDistinctColumnValues(const SQLiteTable &table,
                                          const std::string &columnName);
+  */
 
   //std::vector<std::string>
       // GetDistinctColumnValues(const SQLiteTable &table,
