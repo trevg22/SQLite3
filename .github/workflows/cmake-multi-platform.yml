@@ -71,7 +71,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{ steps.strings.outputs.build-output-dir }}/Impact
+        files: ${{ steps.strings.outputs.build-output-dir }}/libsqlite3.a
         token: ${{ secrets.GITHUB_TOKEN }}
         tag_name: ${{ github.ref }}
 
