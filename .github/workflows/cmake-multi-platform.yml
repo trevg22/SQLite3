@@ -74,7 +74,7 @@ jobs:
         files: ${{ steps.strings.outputs.build-output-dir }}/libsqlite3.a
         token: ${{ secrets.GITHUB_TOKEN }}
         # tag_name: ${{ github.ref }}
-        tage_name: 0.0.0
+        tag_name: 0.0.0
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
