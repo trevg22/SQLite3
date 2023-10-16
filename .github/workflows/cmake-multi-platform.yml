@@ -12,6 +12,8 @@ jobs:
   release:
     name: release
     runs-on: ubuntu-latest
+    outputs:
+        upload_url: ${{steps.create_release.upload_url}}
     steps:
     - name: Create Release
       id: create_release
@@ -22,9 +24,7 @@ jobs:
           #tag_name: ${{ github.ref }}
           tag_name: 0.0.1
           release_name: Release ${{ github.ref }}
-    - name: Set upload url
-      id: url_step
-      run: echo "::set-output name=upload_url::${{outputs.upload_url}}"
+    
   build:
     needs: release
     runs-on: ${{ matrix.os }}
@@ -95,7 +95,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{needs.url_step.upload_url}} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        upload_url: ${{needs.create_release.upload_url}} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ${{ steps.strings.outputs.build-output-dir }}/libsqlite3.a
         asset_name: libsqlite-${{matrix.os}}.a
         asset_content_type: application/zip
