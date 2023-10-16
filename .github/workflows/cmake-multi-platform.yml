@@ -24,7 +24,7 @@ jobs:
           release_name: Release ${{ github.ref }}
     - name: Set upload url
       id: url_step
-      run: echo "::set-output name=upload_url::${{create_realease.outputs.upload_url}}"
+      run: echo "::set-output name=upload_url::${{outputs.upload_url}}"
   build:
     needs: release
     runs-on: ${{ matrix.os }}
