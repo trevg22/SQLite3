@@ -43,7 +43,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: sqlite-linux
-        path: ${{steps.strings.outputs.build-output-dir}}/sqlite3.a
+        path: ${{steps.strings.outputs.build-output-dir}}/libsqlite3.a
       
     - name: Test
       working-directory: ${{github.workspace}}/build
