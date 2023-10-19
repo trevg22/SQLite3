@@ -6,7 +6,7 @@ on:
   workflow_call:
     outputs:
       output_path:
-        value: ${{steps.strings.outputs.build-output-dir}}
+        value: ${{jobs.build.strings.outputs.build-output-dir}}
         
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
